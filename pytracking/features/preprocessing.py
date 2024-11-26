@@ -128,14 +128,19 @@ def sample_patch(im: torch.Tensor, pos: torch.Tensor, sample_sz: torch.Tensor, o
         # Get image patch
         # im_patch = im2[...,tl[0].item():br[0].item(),tl[1].item():br[1].item()]
 
-    # Get image patch
-    pad = (-tl[1].int().item(), br[1].int().item() - im2.shape[3],
-           -tl[0].int().item(), br[0].int().item() - im2.shape[2])
+    tl, br = tl.int(), br.int()
+    h, w = im2.shape[2:]
+    x0, x0_pad = max(tl[1], 0), -min(tl[1], 0)
+    y0, y0_pad = max(tl[0], 0), -min(tl[0], 0)
+    x1, x1_pad = min(br[1], w), max(br[1], w) - w
+    y1, y1_pad = min(br[0], h), max(br[0], h) - h
 
-    if not is_mask:
-        im_patch = F.pad(im2, pad, pad_mode)
-    else:
-        im_patch = F.pad(im2, pad)
+    # Get image patch
+    im_patch = im2[:, :, y0:y1, x0:x1]
+
+    if x0_pad > 0 or y0_pad > 0 or x1_pad > 0 or y1_pad > 0:
+        pad = [x0_pad, x1_pad, y0_pad, y1_pad]
+        im_patch = F.pad(im_patch, pad, 'constant' if is_mask else pad_mode)
 
     # Get image coordinates
     patch_coord = df * torch.cat((tl, br)).view(1,4)
