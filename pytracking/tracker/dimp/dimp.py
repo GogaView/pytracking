@@ -116,6 +116,8 @@ class DiMP(BaseTracker):
 
         # Compute classification scores
         scores_raw = self.classify_target(test_x)
+        object_presence_score = scores_raw.max()
+        #object_presence_score = torch.max(object_presence_score, torch.sqrt(object_presence_score.clone().detach()))
 
         # Localize the target
         translation_vec, scale_ind, s, flag = self.localize_target(scores_raw, sample_pos, sample_scales)
@@ -173,7 +175,7 @@ class DiMP(BaseTracker):
         else:
             output_state = new_state.tolist()
 
-        out = {'target_bbox': output_state}
+        out = {'target_bbox': output_state, 'object_presence_score': object_presence_score.cpu().item(), 'flag': flag}
         return out
 
 
