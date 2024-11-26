@@ -11,6 +11,8 @@ from pytracking.features import augmentation
 import ltr.data.bounding_box_utils as bbutils
 from ltr.models.target_classifier.initializer import FilterInitializerZero
 from ltr.models.layers import activation
+import numpy as np
+from typing import Union
 
 
 class DiMP(BaseTracker):
@@ -22,7 +24,7 @@ class DiMP(BaseTracker):
             self.params.net.initialize()
         self.features_initialized = True
 
-    def initialize(self, image, info: dict) -> dict:
+    def initialize(self, image: Union[np.ndarray, torch.Tensor], info: dict) -> dict:
         # Initialize some stuff
         self.frame_num = 1
         if not self.params.has('device'):
@@ -91,7 +93,7 @@ class DiMP(BaseTracker):
         return out
 
 
-    def track(self, image, info: dict = None) -> dict:
+    def track(self, image: Union[np.ndarray, torch.Tensor], info: dict = None) -> dict:
         self.debug_info = {}
 
         self.frame_num += 1

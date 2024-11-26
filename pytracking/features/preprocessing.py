@@ -1,14 +1,18 @@
 import torch
 import torch.nn.functional as F
 import numpy as np
+from typing import Union
 
 
-def numpy_to_torch(a: np.ndarray):
-    return torch.from_numpy(a).float().permute(2, 0, 1).unsqueeze(0)
+def numpy_to_torch(a: Union[np.ndarray, torch.Tensor]):
+    if isinstance(a, np.ndarray):
+        return torch.from_numpy(a).float().permute(2, 0, 1).unsqueeze(0)
+    else:
+        return a.float().permute(2, 0, 1).unsqueeze(0)
 
 
 def torch_to_numpy(a: torch.Tensor):
-    return a.squeeze(0).permute(1,2,0).numpy()
+    return a.squeeze(0).permute(1,2,0).cpu().numpy()
 
 
 def sample_patch_transformed(im, pos, scale, image_sz, transforms, is_mask=False):

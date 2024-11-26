@@ -60,8 +60,8 @@ class NetWithBackbone(NetWrapper):
 
         if self.image_format in ['bgr', 'bgr255']:
             im = im[:, [2, 1, 0], :, :]
-        im -= self._mean
-        im /= self._std
+        im -= self._mean.to(device=im.device)
+        im /= self._std.to(device=im.device)
 
         if self.use_gpu:
             im = im.cuda()

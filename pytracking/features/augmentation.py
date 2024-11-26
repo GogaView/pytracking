@@ -116,7 +116,7 @@ class Rotate(Transform):
 
     def __call__(self, image, is_mask=False):
         if isinstance(image, torch.Tensor):
-            return self.crop_to_output(numpy_to_torch(self(torch_to_numpy(image))))
+            return self.crop_to_output(numpy_to_torch(self(torch_to_numpy(image)))).to(device=image.device)
         else:
             c = (np.expand_dims(np.array(image.shape[:2]),1)-1)/2
             R = np.array([[math.cos(self.angle), math.sin(self.angle)],
@@ -141,6 +141,7 @@ class Blur(Transform):
     def __call__(self, image, is_mask=False):
         if isinstance(image, torch.Tensor):
             sz = image.shape[2:]
+            self.filter = [f.to(device=image.device) for f in self.filter]
             im1 = F.conv2d(image.view(-1,1,sz[0],sz[1]), self.filter[0], padding=(self.filter_size[0],0))
             return self.crop_to_output(F.conv2d(im1, self.filter[1], padding=(0,self.filter_size[1])).view(1,-1,sz[0],sz[1]))
         else:
