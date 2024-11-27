@@ -89,7 +89,7 @@ class DiMP(BaseTracker):
         if self.params.get('use_iou_net', True):
             self.init_iou_net(init_backbone_feat)
 
-        out = {'time': time.time() - tic}
+        out = {'time': time.time() - tic, 'object_presence_score': 1.0, 'flag': 'normal'}
         return out
 
 
